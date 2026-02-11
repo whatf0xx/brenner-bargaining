@@ -13,9 +13,11 @@ class Agent:
     def util(self, other: "Agent") -> float:
         p_i, rho_i, v_i  = self.p, self.rho, self.v
         p_j, rho_j, v_j = other.p, other.rho, other.v
-
-        return 0.5 * (p_i * (1 + rho_i / v_j) \
+        threat = rho_i * p_i / v_j
+        nash = 0.5 * (p_i * (1 + rho_i / v_j) \
                     + p_j * (1 - rho_j / v_i))
+
+        return max(threat, nash)
 
     def dudp(self, other: "Agent") -> float:
         rho_i = self.rho
@@ -52,7 +54,7 @@ def step(peasant: Agent, elite: Agent, scale: float):
 
 if __name__ == "__main__":
     peasant = Agent(
-        0.4,
+        0.6,
         0.2,
         0.1,
     )
@@ -71,7 +73,7 @@ if __name__ == "__main__":
     for _ in t:
         p_u.append(peasant.util(elite))
         e_u.append(elite.util(peasant))
-        step(peasant, elite, 0.05)
+        step(peasant, elite, 0.01)
         peasants.append(Agent(peasant.p, peasant.rho, peasant.v))
         elites.append(Agent(elite.p, elite.rho, elite.v))
 
